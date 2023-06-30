@@ -4,13 +4,13 @@ from typing import Dict
 
 from typing_extensions import Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from suntime import Sun
 
 
 class Location(BaseModel):
-    latitude: float
-    longitude: float
+    latitude: float = Field(ge=-90.0, le=90.0)
+    longitude: float = Field(ge=-180.0, le=180.0)
 
     # Make it hashable to allow use of lru_cache, see:
     # https://github.com/pydantic/pydantic/pull/1881
