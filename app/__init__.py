@@ -1,23 +1,20 @@
 from datetime import datetime as Datetime
-from typing import Annotated, Tuple
+from typing import Annotated
 
 from fastapi import FastAPI, Body
+from starlette.responses import FileResponse
+from starlette.staticfiles import StaticFiles
 
-from models import Location, SunEventPair
+from app.models import Location, SunEventPair
 
-app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+api = FastAPI(title="API app")
 
 
-@app.post("/api/location/date/")
+@api.post("/api/location/date/")
 def api_location_both(
         location: Annotated[Location, Body()],
         datetime: Annotated[Datetime, Body()]
-) -> Tuple[Datetime, Datetime]:
+) -> SunEventPair:
     """
     Return a single sun event pair for location on a given date
 
@@ -26,3 +23,13 @@ def api_location_both(
     :return:
     """
     return SunEventPair.at_location_and_time(location, datetime)
+
+
+app = FastAPI(title="Main app")
+app.mount("/api", api)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/")
+def homepage():
+    return FileResponse("static/index.html")
