@@ -1,0 +1,49 @@
+html, body {
+    height: 100%;
+}
+#locationDisplay form  {
+    margin-top: 0.5rem;
+}
+
+#mapWrapper {
+    position: relative;
+    width: 100%;
+    padding: 0 0 0 0;
+    box-sizing: content-box;
+    clip-path: inset(0px);
+    margin-bottom: 0.5rem;
+    background-color: green;
+}
+
+#mapWrapper > img:nth-child(1) {
+    /* eliminate extra space at bottom*/
+    display: block;
+}
+
+#mapWrapper > * {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+/* Set the cursor and any other icons to use their positions as their centers
+ * IMPORTANT: do not set the position here */
+#mapWrapper > svg {
+    position: absolute;
+    overflow: visible;
+}
+
+#locationDisplay,
+#locationDisplay table,
+#locationDisplay tbody
+{
+    width 100%;
+}
+
+#locationDisplay tbody > tr {
+    background-color: var(--background-color);
+    width: 100%;
+}
+
+#locationDisplay tbody > tr > td {
+    width: 50%;
+}

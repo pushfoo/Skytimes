@@ -1,19 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunrise & Sunset JSON Demo</title>
+
+    <link rel="stylesheet" href="static/css/holiday.css@0.11.2.css" />
+    <link rel="stylesheet" href="static/css/style.css" media="screen">
+    <script type="module" src="static/js/ui.js" defer></script>
 </head>
 
 <body>
-    <!--
-    <noscript>You need JavaScript enabled to load JSON content.</noscript>
-    <div id="displayArea">
-        <ol>
-        </ol>
-    </div>
-    -->
-    <div id="target" width="200" height="200" background="red">Target</div>
-    <script type="module" src="static/js/sunapi.js" defer></script>
+    <header>
+        <h1>Sunrise & Sunset Times</h1>
+    </header>
+
+    <main>
+        <div id="locationDisplay">
+            <noscript>You need JavaScript enabled to use this page!</noscript>
+            <p>Choose your location by clicking the map.</p>
+            <form id="locationForm">
+                <label>
+                    Date
+                    <input id="date" name="date" type="date">
+                </label>
+                <table id="eventTimes">
+                    <caption></caption>
+                    <tr><td>Sunrise</td><td><span id="sunriseDest"> - </span></td></tr>
+                    <tr><td>Sunset</td><td><span id="sunsetDest"> - </span></td></tr>
+                </table>
+
+                <div id="mapWrapper">
+                    <img id="map" width="100%" src="static/map/world.svg" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="cursor">
+                        <circle color="red" cx="0" cy="0" r="5" fill="red"/>
+                    </svg>
+                </div>
+
+                <fieldset>
+                <label>
+                    Latitude
+                    <input name="latitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
+                </label>
+                <label>
+                    Longitude
+                    <input name ="longitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
+                </label>
+                </fieldset>
+            </form>
+        </div>
+
+
+    </main>
+    <footer>
+        a <a href="https://github.com/pushfoo">project</a> by <a href="https://github.com/pushfoo">pushfoo</a>
+    </footer>
+
 </body>
 </html>

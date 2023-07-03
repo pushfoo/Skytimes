@@ -1,23 +1,26 @@
-import { firstLevelPropsToObj } from './helpers.js';
-import { Location } from './location.js';
+import { isNullOrUndefined } from './helpers.js';
+import { Coordinates } from './coordinates.js';
 
 
 class SunAPI {
 
-    structureRequest(requestLocation, date) {
-        var latlon = firstLevelPropsToObj(requestLocation, "latitude", "longitude");
+    structureRequest(coordinates, date) {
         return {
-            location: latlon,
-            datetime: this.dateISO
+            location: {
+                latitude: coordinates.latitude,
+                longitude: coordinates.longitude
+            },
+            datetime: date.toISOString()
         };
     }
 
-    clickTrigger() {
-        const payload = this.structureRequest(this.location, this.date);
-        const newUrl = this.buildEndpointURL("location", "date");
+    getTimesForDate(handlerCallback, coordinates, date = null) {
+        const payload = this.structureRequest(
+            coordinates, isNullOrUndefined(date) ? new Date() : date
+            );
         console.log(JSON.stringify(payload));
         const request = new Request(
-            newUrl,
+            this.locationDateEndpoint,
             {
                 method: "POST",
                 headers: {
@@ -26,41 +29,22 @@ class SunAPI {
                 body: JSON.stringify(payload)
             }
         );
-        console.log("fetching " + newUrl);
-        fetch(request)
-            .then((response) => response.text())
-            .then((text) => {
-                console.log(text);
-            });
-        }
+        console.log("fetching " + this.locationDateEndpoint);
 
+        fetch(request)
+            .then((response) => response.json() )
+            .then(handlerCallback);
+    }
 
     buildEndpointURL(...parts) {
         return `${this.baseURL}${parts.join("/")}\/`;
     }
-    constructor(targetElement) {
-        // Establish base API URL
-        const { protocol, hostname, port } = window.location;
-        this.baseURL = `${protocol}\/\/${hostname}:${port}/api/`;
 
-        // Filler values
-        this.location  = new Location(0, 0);
-        this.dateStamp = Date.now();
-        this.date      = new Date(this.dateStamp);
-        this.dateISO   = this.date.toISOString();
-        this.targetElement = targetElement;
-        targetElement.addEventListener("click", (event) => {
-            console.log("trace");
-            this.clickTrigger();
-        });
+    constructor(baseURL) {
+        this.baseURL = baseURL;
+        this.locationDateEndpoint = this.buildEndpointURL("location", "date");
     }
-    /*
-    function fillElement() {
-        const body        = document.body;
-        body.onclick =
-        const displayArea = document.getElementById("displayArea");
-        const childList   = displayArea.firstChild;
 
-    }*/
 }
-const sunAPI = new SunAPI(document.getElementById("target"));
+
+export { SunAPI };
