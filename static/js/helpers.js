@@ -1,3 +1,15 @@
+const isNull = (obj) => {
+    return Object.is(obj, null);
+};
+
+const isUndefined = (obj) => {
+    return Object.is(obj, undefined);
+}
+
+const isNullOrUndefined = (obj) => {
+    return isNull(obj, null) || isUndefined(obj, undefined);
+};
+
 const firstLevelPropsToObj = (srcObj, ...props) => {
     var outObj = {};
     props.forEach(prop => outObj[prop] = srcObj[prop]);
@@ -21,9 +33,28 @@ const symmetricCheck = (val, sides) => {
     return boundCheck(val, low, high);
 };
 
+const isProperNormalized = (value) => {
+    return boundCheck(value, 0.0, 1.0);
+}
+
+const normalizedToRange = (normalized, rangeStartInclusive, rangeEndInclusive) => {
+    return (normalized * (rangeEndInclusive - rangeStartInclusive)) + rangeStartInclusive;
+}
+
+const rangeToNormalized = (withinRange, rangeStartInclusive, rangeEndInclusive) => {
+    return ( withinRange - rangeStartInclusive ) / ( rangeEndInclusive - rangeStartInclusive );
+};
+
+
 export {
+    isNull,
+    isUndefined,
+    isNullOrUndefined,
     firstLevelPropsToObj,
     firstLevelPropsToArray,
     boundCheck,
-    symmetricCheck
+    symmetricCheck,
+    isProperNormalized,
+    normalizedToRange,
+    rangeToNormalized,
 };
