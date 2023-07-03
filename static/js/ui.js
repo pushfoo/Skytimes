@@ -23,13 +23,19 @@ const dateToFieldString = (date) => {
     return base.join("-");
 };
 
+const getHourMinString = (dateTime, use12Hour = true) => {
+    return dateTime
+        .toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: use12Hour, timeZone: 'UTC'})
+        .toUpperCase();
+};
+
 
 class DateTimeUI {
 
     calculateTimes() {
         this.sunAPI.getTimesForDate((jsonData) => {
-            this.sunriseDest.innerText = jsonData["sunrise"].toString();
-            this.sunsetDest.innerText = jsonData["sunset"].toString();
+            this.sunriseDest.innerText = getHourMinString(jsonData["sunrise"]);
+            this.sunsetDest.innerText  = getHourMinString(jsonData["sunset" ]);
         },
         this.coordinates, this.date);
     }
@@ -73,6 +79,7 @@ class DateTimeUI {
         this.longitudeField = elements["longitude"];
         this.latitudeField  = elements["latitude"];
         this.setDate();
+
         // Set up map elements
         this.mapWrapper   = targetElement.querySelector("#mapWrapper");
         this.mapBaseLayer = mapWrapper.querySelector("#map");
@@ -96,8 +103,6 @@ class DateTimeUI {
             this.date =  new Date(Date.parse(this.dateField.value));
             this.calculateTimes()
         });
-
-        this.calculateTimes();
     }
 
 }

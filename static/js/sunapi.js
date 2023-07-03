@@ -32,7 +32,13 @@ class SunAPI {
         console.log("fetching " + this.locationDateEndpoint);
 
         fetch(request)
-            .then((response) => response.json() )
+            // deserialize JSON to an actual object
+            .then((response) => response.json())
+            // map raw date strings to Date objects
+            .then((data) => Object
+                .fromEntries(Object.entries(data)
+                .map(([k,v]) => [k, new Date(v)]))
+            )
             .then(handlerCallback);
     }
 
