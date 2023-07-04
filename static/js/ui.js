@@ -1,4 +1,4 @@
-import { normalizedToRange, isNullOrUndefined } from './helpers.js';
+import { normalizedToRange, isNull, isNullOrUndefined } from './helpers.js';
 import { SunAPI } from './sunapi.js';
 import { Coordinates } from './coordinates.js';
 
@@ -29,15 +29,62 @@ const getHourMinString = (dateTime, use12Hour = true) => {
         .toUpperCase();
 };
 
+const generateRadioButtonValueTranslationHandlers = (rawToFinalValueMapping, actionCallback) => {
+    const result = new Map();
+    rawToFinalValueMapping.forEach((finalRadioValue, originalRadioValue, map) => {
+        const finalRadioValueLocal = finalRadioValue;
+        function callback(event) {
+            actionCallback(finalRadioValueLocal);
+        }
+        result.set(originalRadioValue, callback);
+    });
+    return result;
+};
+
+const bindRadioButtonChangeEventHandlers =
+    (rootElement, radioNameToEventHandlerMapping, querySelector = "input[type='radio']") => {
+    rootElement
+        .querySelectorAll(querySelector)
+        .forEach((radio) => {
+            const eventHandlerForName = radioNameToEventHandlerMapping.get(radio.value);
+            radio.addEventListener("change", eventHandlerForName);
+        });
+    };
 
 class DateTimeUI {
 
+    set use12Hour(use12HourBool) {
+
+        if ( typeof use12HourBool != "boolean" ) {
+            throw new TypeError("use12HourBool must be a boolean value");
+        }
+        this._use12Hour = use12HourBool;
+        this.refreshTimeDisplay();
+    }
+
+    get use12Hour() {
+        return this._use12Hour;
+    }
+
+    refreshTimeDisplay() {
+           this.sunriseDest.innerText = getHourMinString(this.eventTimes.sunrise, this._use12Hour);
+           this.sunsetDest.innerText  = getHourMinString(this.eventTimes.sunset, this._use12Hour);
+    }
+
+    set eventTimes(newEventTimes) {
+        this._eventTimes = newEventTimes;
+        this.refreshTimeDisplay();
+    }
+    get eventTimes() {
+        return this._eventTimes;
+    }
+
     calculateTimes() {
-        this.sunAPI.getTimesForDate((jsonData) => {
-            this.sunriseDest.innerText = getHourMinString(jsonData["sunrise"]);
-            this.sunsetDest.innerText  = getHourMinString(jsonData["sunset" ]);
-        },
-        this.coordinates, this.date);
+        this.sunAPI.getTimesForDate(
+            (jsonData) => this.eventTimes = jsonData,
+            this.coordinates,
+            this.date
+        );
     }
 
     setDate(date = null) {
@@ -68,6 +115,9 @@ class DateTimeUI {
         const { protocol, hostname, port } = window.location;
         this.sunAPI    = new SunAPI(`${protocol}\/\/${hostname}:${port}/api/`);
 
+        this._use12Hour  = true;
+        this._eventTimes = null;
+
         this.sunriseDest = targetElement.querySelector("#sunriseDest");
         this.sunsetDest  = targetElement.querySelector("#sunsetDest");
 
@@ -78,6 +128,7 @@ class DateTimeUI {
         this.dateElement    = targetElement.querySelector('#date');
         this.longitudeField = elements["longitude"];
         this.latitudeField  = elements["latitude"];
+
         this.setDate();
 
         // Set up map elements
@@ -103,6 +154,17 @@ class DateTimeUI {
             this.date =  new Date(Date.parse(this.dateField.value));
             this.calculateTimes()
         });
+
+        // Bind update events for radio buttons
+        this.timeRadios = targetElement.querySelector("#timeRadios");
+        bindRadioButtonChangeEventHandlers(
+            this.timeRadios,
+            generateRadioButtonValueTranslationHandlers(
+                new Map([['12', true], ['24', false]]),
+                (value) => this.use12Hour = value
+            )
+        );
+
     }
 
 }
