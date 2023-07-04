@@ -17,12 +17,14 @@
 
     <main id="locationDisplay">
         <noscript>You need JavaScript enabled to use this page!</noscript>
-        <table id="eventTimes">
-                <caption></caption>
-                <tr><th scope="col">Event</th><th scope="col">UTC Time</th>
-                <tr><td>Sunrise</td><td><span id="sunriseDest"> - </span></td></tr>
-                <tr><td>Sunset</td><td><span id="sunsetDest"> - </span></td></tr>
-        </table>
+
+        <div id="eventTimes">
+                <table>
+                    <tr><th> </th><th scope="col">Event</th><th scope="col">UTC Time</th>
+                    <tr><td>🌅</td><td>Sunrise</td><td><span id="sunriseDest"> - </span></td></tr>
+                    <tr><td>🌇</td><td>Sunset</td><td><span id="sunsetDest"> - </span></td></tr>
+                </table>
+        </div>
         <form id="locationForm">
             <fieldset>
                 <legend>Date</legend>

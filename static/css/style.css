@@ -46,12 +46,16 @@ form > label {
     display: block;
 }
 
-#locationDisplay,
-{
-    width 100%;
+/* Center table on the screen the simple, old-school way*/
+#eventTimes {
+    text-align: center;
 }
 
-#locationDisplay tbody > tr {
+#eventTimes > * {
+    display: inline-block;
+}
+
+#eventTimes tbody > tr {
     background-color: var(--background-color);
 }
 
