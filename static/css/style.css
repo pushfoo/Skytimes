@@ -1,6 +1,7 @@
 html, body {
     height: 100%;
 }
+
 #locationDisplay form  {
     margin-top: 0.5rem;
 }
@@ -21,7 +22,7 @@ html, body {
 }
 
 #mapWrapper > * {
-    margin: 0 0 0 0;
+    margin:  0 0 0 0;
     padding: 0 0 0 0;
 }
 
@@ -32,18 +33,36 @@ html, body {
     overflow: visible;
 }
 
+section {
+    width: 100%;
+}
+
+section > *  {
+    text-align: center;
+}
+
+form > label {
+    width: 100%;
+    display: block;
+}
+
 #locationDisplay,
-#locationDisplay table,
-#locationDisplay tbody
 {
     width 100%;
 }
 
 #locationDisplay tbody > tr {
     background-color: var(--background-color);
-    width: 100%;
 }
 
-#locationDisplay tbody > tr > td {
-    width: 50%;
+/* Use horizontal layout on larger screens */
+@media only screen and (min-width: 400px) {
+    section {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    section > * {
+        flex: 1;
+    }
 }

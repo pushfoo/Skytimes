@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,21 +15,32 @@
         <h1>Sunrise & Sunset Times</h1>
     </header>
 
-    <main>
-        <div id="locationDisplay">
-            <noscript>You need JavaScript enabled to use this page!</noscript>
-            <p>Choose your location by clicking the map.</p>
-            <form id="locationForm">
-                <label>
-                    Date
-                    <input id="date" name="date" type="date">
-                </label>
-                <table id="eventTimes">
-                    <caption></caption>
-                    <tr><td>Sunrise</td><td><span id="sunriseDest"> - </span></td></tr>
-                    <tr><td>Sunset</td><td><span id="sunsetDest"> - </span></td></tr>
-                </table>
+    <main id="locationDisplay">
+        <noscript>You need JavaScript enabled to use this page!</noscript>
+        <table id="eventTimes">
+                <caption></caption>
+                <tr><th scope="col">Event</th><th scope="col">UTC Time</th>
+                <tr><td>Sunrise</td><td><span id="sunriseDest"> - </span></td></tr>
+                <tr><td>Sunset</td><td><span id="sunsetDest"> - </span></td></tr>
+        </table>
+        <form id="locationForm">
+            <fieldset>
+                <legend>Date</legend>
+                <input id="date" name="date" type="date">
+            </fieldset>
 
+            <fieldset>
+                <legend>Hour mode</legend>
+
+                <section id="timeRadios">
+                        <label><input type="radio" name="hourmode">12 Hour (AM/PM)</label>
+                        <label><input type="radio" name="hourmode">24 Hour (00:00)</label>
+                </section>
+
+            </fieldset>
+            <fieldset>
+                <legend>Coordinates</legend>
+                <p>Choose your location by clicking the map.</p>
                 <div id="mapWrapper">
                     <img id="map" width="100%" src="static/map/world.svg" xmlns="http://www.w3.org/2000/svg">
                     <svg id="cursor">
@@ -37,18 +48,18 @@
                     </svg>
                 </div>
 
-                <fieldset>
-                <label>
-                    Latitude
-                    <input name="latitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
-                </label>
-                <label>
-                    Longitude
-                    <input name ="longitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
-                </label>
-                </fieldset>
-            </form>
-        </div>
+                <section>
+                    <label>
+                        Latitude
+                        <input name="latitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
+                    </label>
+                    <label>
+                        Longitude
+                        <input name ="longitude" type="text" inputmode="numeric" value="0.0" readonly="readonly">
+                    </label>
+                </section>
+            </fieldset>
+        </form>
 
 
     </main>
