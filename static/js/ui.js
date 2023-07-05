@@ -99,8 +99,9 @@ class DateTimeUI {
         this.latitudeField.value = coordinatesObject.latitude.toString();
         this.longitudeField.value = coordinatesObject.longitude.toString();
 
-        this.mapPointer.style.left = `${coordinatesObject.normalizedLongitude * 100}%`;
-        this.mapPointer.style.top  = `${coordinatesObject.normalizedLatitude  * 100}%`;
+        // Convert from coordinate space to screen space
+        this.mapPointer.style.top  = `${(1.0 - coordinatesObject.normalizedLatitude) * 100}%`;
+        this.mapPointer.style.left = `${       coordinatesObject.normalizedLongitude * 100}%`;
 
         this._coordinates = coordinatesObject;
         this.calculateTimes();
@@ -141,11 +142,12 @@ class DateTimeUI {
 
         // Move the dot whenever the coordinates are set
         this.mapWrapper.addEventListener("click", (event) => {
-            // Calculate the normalized position & set the UI's coordinates from it
+            // Convert from screen space to coordinate space
             const bbox     = this.mapBaseLayer.getBoundingClientRect();
-            const normLong = (event.clientX - bbox.left) / bbox.width;
-            const normLat  = (event.clientY - bbox.top ) / bbox.height;
+            const normLat  = 1.0 - (event.clientY - bbox.top ) / bbox.height;
+            const normLong =       (event.clientX - bbox.left) / bbox.width;
 
+            // Set the coordinates on the UI
             this.coordinates = Coordinates.fromNormalized(normLat, normLong);
         });
 
