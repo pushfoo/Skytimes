@@ -1,0 +1,40 @@
+[project]
+name = "skytimes"
+version = "0.1"
+readme = "README.md"
+description = "A minimal web application which displays sunset & sunrise times."
+authors = [
+    {name="pushfoo"}
+]
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+classifiers=[
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    'suntime==1.2.5',
+    'uvicorn==0.22.0',
+    'fastapi==0.99.0'
+]
+
+[project.urls]
+Homepage = "https://github.com/pushfoo/Skytimes"
+Issues = "https://github.com/pushfoo/Skytimes"
+Source = "https://github.com/pushfoo/Skytimes"
+
+[tool.setuptools.packages.find]
+include = ["app", "app.*"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+norecursedirs = ["doc", ".venv", "env", "dist"]
