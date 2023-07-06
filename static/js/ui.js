@@ -23,10 +23,15 @@ const dateToFieldString = (date) => {
     return base.join("-");
 };
 
-const getHourMinString = (dateTime, use12Hour = true) => {
-    return dateTime
-        .toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: use12Hour, timeZone: 'UTC'})
-        .toUpperCase();
+const getHourMinString = (dateTime, use12Hour = true, onNullMessage = 'N/A') => {
+    if ( isNull(dateTime) ) {
+        return onNullMessage;
+    }
+    else {
+        return dateTime
+            .toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: use12Hour, timeZone: 'UTC'})
+            .toUpperCase();
+    }
 };
 
 const generateRadioButtonValueTranslationHandlers = (rawToFinalValueMapping, actionCallback) => {

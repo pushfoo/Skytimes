@@ -1,4 +1,4 @@
-import { isNullOrUndefined } from './helpers.js';
+import { isNull, isNullOrUndefined } from './helpers.js';
 import { Coordinates } from './coordinates.js';
 
 
@@ -37,7 +37,7 @@ class SunAPI {
             // map raw date strings to Date objects
             .then((data) => Object
                 .fromEntries(Object.entries(data)
-                .map(([k,v]) => [k, new Date(v)]))
+                .map(([k,v]) => [k, isNull(v) ? null : new Date(v)]))
             )
             .then(handlerCallback);
     }
