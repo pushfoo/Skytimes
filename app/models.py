@@ -1,6 +1,6 @@
 from datetime import datetime as Datetime
 from functools import lru_cache
-from typing import Dict, Optional
+from typing import Optional
 
 from typing_extensions import Self
 
@@ -53,7 +53,3 @@ class SunEventPair(BaseModel):
             sunrise=sunrise,
             sunset=sunset
         )
-
-
-class SunEventTimes(BaseModel):
-    datetimes: Dict[Datetime, SunEventPair]
