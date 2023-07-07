@@ -15,12 +15,17 @@ via JSON fetch requests.
 
 ## Usage
 
+First, have Python 3.9 or greater installed with a working pip.
+3.8 may work as well, but it has not been tested. Then, clone
+this repository locally and do the following:
+
 1. `pip install .`
-2. On Linux and Mac, use `./launch.sh` to launch the server. Use `uvicorn app:app --reload` on Windows.
+2. Launch the backend with `uvicorn app:app --reload`
 3. Open https://localhost:8000/ in your browser
 
-## Asset Credits
+Mac & Linux users can use `./launch.sh` as shorthand to launch the application.
 
-| Component                 | Purpose                             | License                  | Project or Source URL                                                      |
-|---------------------------|-------------------------------------|--------------------------|----------------------------------------------------------------------------|
-| Equirectilinear World Map | The map used for location selection | Public Domain Dedication | https://upload.wikimedia.org/wikipedia/commons/a/ac/World_location_map.svg |
+## Asset Credits
+| Component                 | License       | Project or Source URL                                                      |
+|---------------------------|---------------|----------------------------------------------------------------------------|
+| Equirectilinear World Map | Public Domain | https://upload.wikimedia.org/wikipedia/commons/a/ac/World_location_map.svg |
