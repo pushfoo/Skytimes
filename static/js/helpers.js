@@ -45,6 +45,66 @@ const rangeToNormalized = (withinRange, rangeStartInclusive, rangeEndInclusive) 
     return ( withinRange - rangeStartInclusive ) / ( rangeEndInclusive - rangeStartInclusive );
 };
 
+/**
+ * Skip the first element or elements of an iterator
+ * @param {Iterator}
+ * @returns {Iterator} the same iterator
+ **/
+const skip = (iterator, num = 1) => {
+    if (num < 0) {
+        throw new TypeError("Can't skip a negative number of elements!");
+    }
+    for (var i = 0; i < num; i++) {
+        iterator = iterator.next();
+    }
+    return iterator;
+};
+
+/**
+ * A generator function which adapts arrays for use with other iterators
+ * @generator
+ * @param {Array} array - the array to adapt.
+ * @yields {*} The next element in the passed array.
+ **/
+function* arrayIterator(array) {
+    for(var i = 0; i < array.length; i++) {
+        yield array[i];
+    }
+}
+
+/**
+ * Yields arrays with the same length as the number of sources until it can't make a full row.
+ * @generator
+ * @param {...array|Iterator} sources - Arrays and/or iterators to zip.
+ * @yields {array} 0 or more arrays of the same length as the number of sources
+ **/
+function* zip(...sources) {
+    const iterators = [];
+    for (const source of sources) {
+        if ( Array.isArray(source) ) {
+            iterators.push(arrayIterator(source));
+        } else {
+            iterators.push(source)
+        }
+    }
+
+    var running = true;
+    let nextResult = undefined;
+    while (running) {
+         const yieldArray = [];
+         for ( var i = 0; i < iterators.length; i++ ) {
+            next_result = iterators[i].next();
+            if ( next_result.done ) {
+                running = false;
+                break;
+            }
+            yieldArray.push(next_result.value);
+         }
+         if( running ) {
+            yield yieldArray;
+         }
+    }
+}
 
 export {
     isNull,
@@ -57,4 +117,6 @@ export {
     isProperNormalized,
     normalizedToRange,
     rangeToNormalized,
+    arrayIterator,
+    zip
 };
