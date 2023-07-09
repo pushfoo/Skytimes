@@ -1,5 +1,6 @@
 from dateutil import parser
-from typing import Annotated
+from typing import Annotated, Optional
+from timezonefinder import TimezoneFinder
 
 from fastapi import FastAPI, Body
 from starlette.responses import FileResponse
@@ -10,12 +11,24 @@ from app.models import Location, SunEventPair
 # Set up the core server
 app = FastAPI(title="Main app")
 
-
 # API application
 api = FastAPI(title="API app")
 
+# Allows us to find a time zone for a location
+tf = TimezoneFinder()
 
-# This handles
+
+@api.post("/location/timezone/")
+def api_location_zone(location: Annotated[Location, Body()]) -> Optional[str]:
+    """
+    Fetch the time zone for a given location, or None if no zone was found.
+
+    :param location: A latitude, longitude location.
+    :return: a time zone string or None.
+    """
+    return tf.timezone_at(lat=location.latitude, lng=location.longitude)
+
+
 @api.post("/location/date/")
 def api_location_datetime(
         location: Annotated[Location, Body()],
