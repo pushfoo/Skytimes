@@ -1,6 +1,7 @@
 import { normalizedToRange, isNull, isNullOrUndefined } from './helpers.js';
 import { SunAPI } from './sunapi.js';
 import { Coordinates } from './coordinates.js';
+import { WorldMap } from './worldmap.js';
 
 
 const intToZeroPaddedString = (sourceInt, numZeroesOnLeft) => {
@@ -87,7 +88,7 @@ class DateTimeUI {
     calculateTimes() {
         this.sunAPI.getTimesForDate(
             (jsonData) => this.eventTimes = jsonData,
-            this.coordinates,
+            this.worldMap.coordinates,
             this.date
         );
     }
@@ -98,22 +99,6 @@ class DateTimeUI {
         }
         this.date = date;
         this.dateField.value = dateToFieldString();
-    }
-
-    set coordinates(coordinatesObject) {
-        this.latitudeField.value = coordinatesObject.latitude.toString();
-        this.longitudeField.value = coordinatesObject.longitude.toString();
-
-        // Convert from coordinate space to screen space
-        this.mapPointer.style.top  = `${(1.0 - coordinatesObject.normalizedLatitude) * 100}%`;
-        this.mapPointer.style.left = `${       coordinatesObject.normalizedLongitude * 100}%`;
-
-        this._coordinates = coordinatesObject;
-        this.calculateTimes();
-    }
-
-    get coordinates() {
-        return this._coordinates;
     }
 
     constructor(targetElement, coordinates = null) {
@@ -132,29 +117,24 @@ class DateTimeUI {
         const elements      = form.elements;
         this.dateField      = elements["date"];
         this.dateElement    = targetElement.querySelector('#date');
+
         this.longitudeField = elements["longitude"];
         this.latitudeField  = elements["latitude"];
 
         this.setDate();
 
         // Set up map elements
-        this.mapWrapper   = targetElement.querySelector("#mapWrapper");
-        this.mapBaseLayer = mapWrapper.querySelector("#map");
-        this.mapPointer   = mapWrapper.querySelector("#cursor");
-
-        // Center on 0, 0 if coordinates not specified
-        this.coordinates  = isNullOrUndefined(coordinates) ? new Coordinates(0.0, 0.0) : coordinates;
-
-        // Move the dot whenever the coordinates are set
-        this.mapWrapper.addEventListener("click", (event) => {
-            // Convert from screen space to coordinate space
-            const bbox     = this.mapBaseLayer.getBoundingClientRect();
-            const normLat  = 1.0 - (event.clientY - bbox.top ) / bbox.height;
-            const normLong =       (event.clientX - bbox.left) / bbox.width;
-
-            // Set the coordinates on the UI
-            this.coordinates = Coordinates.fromNormalized(normLat, normLong);
-        });
+        this.worldMap     = new WorldMap(
+            targetElement.querySelector("#mapWrapper"),
+            // Center on 0, 0 if coordinates not specified
+            new Coordinates(0,0),
+            (coordinates) => {
+                this.latitudeField.value = coordinates.latitude.toString();
+                this.longitudeField.value = coordinates.longitude.toString();
+                this.calculateTimes();
+            }
+        );
+        this.calculateTimes();
 
         // Bind updates on the date field changing
         this.dateElement.addEventListener("change", (event) => {
