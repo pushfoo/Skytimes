@@ -148,6 +148,10 @@ class Coordinates {
             longitude: this._longitude
         };
     }
+
+    toString() {
+        return `Latitude ${this._latitude}, Longitude ${this.longitude}`;
+    }
 }
 
 export { Coordinates };
