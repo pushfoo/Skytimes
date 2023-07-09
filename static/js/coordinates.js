@@ -141,6 +141,13 @@ class Coordinates {
     static fromNormalized(normalizedLatitude, normalizedLongitude) {
         return new Coordinates(normalizedLatitude, normalizedLongitude, true);
     }
+
+    toJSON() {
+        return {
+            latitude: this._latitude,
+            longitude: this._longitude
+        };
+    }
 }
 
 export { Coordinates };

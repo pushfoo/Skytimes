@@ -1,34 +1,31 @@
-import { isNull, isNullOrUndefined } from './helpers.js';
+import { isNull, isNullOrUndefined, firstLevelPropsToObj } from './helpers.js';
 import { Coordinates } from './coordinates.js';
 
 
+const buildPOSTRequest = (endpoint, object) => {
+    const request = new Request(
+        endpoint,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(object)
+        }
+    );
+    return request;
+}
+
 class SunAPI {
 
-    structureRequest(coordinates, date) {
-        return {
-            location: {
-                latitude: coordinates.latitude,
-                longitude: coordinates.longitude
-            },
-            datetime: date.toISOString()
-        };
-    }
-
     getTimesForDate(handlerCallback, coordinates, date = null) {
-        const payload = this.structureRequest(
-            coordinates, isNullOrUndefined(date) ? new Date() : date
-            );
-        console.log(JSON.stringify(payload));
-        const request = new Request(
+
+        const request = buildPOSTRequest(
             this.locationDateEndpoint,
             {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                location: firstLevelPropsToObj(coordinates, "latitude", "longitude"),
+                datetime: (isNullOrUndefined(date) ? new Date() : date).toISOString()
             }
         );
+
         console.log("fetching " + this.locationDateEndpoint);
 
         fetch(request)
