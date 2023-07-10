@@ -16,12 +16,22 @@ const buildPOSTRequest = (endpoint, object) => {
 
 class SunAPI {
 
+    getTimezoneForLocation(handlerCallback, coordinates) {
+        const request = buildPOSTRequest(
+            this.locationTimezoneEndpoint,
+            coordinates
+        );
+        fetch(request)
+            .then((response) => response.json())
+            .then(handlerCallback);
+    }
+
     getTimesForDate(handlerCallback, coordinates, date = null) {
 
         const request = buildPOSTRequest(
             this.locationDateEndpoint,
             {
-                location: firstLevelPropsToObj(coordinates, "latitude", "longitude"),
+                location: coordinates,
                 datetime: (isNullOrUndefined(date) ? new Date() : date).toISOString()
             }
         );
@@ -46,6 +56,7 @@ class SunAPI {
     constructor(baseURL) {
         this.baseURL = baseURL;
         this.locationDateEndpoint = this.buildEndpointURL("location", "date");
+        this.locationTimezoneEndpoint = this.buildEndpointURL("location", "timezone");
     }
 
 }
