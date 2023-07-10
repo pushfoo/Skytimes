@@ -1,39 +1,15 @@
 import { normalizedToRange, isNull, isNullOrUndefined } from './helpers.js';
+import {
+    dateToFieldString,
+    getHourMinString,
+    hour12Format,
+    hour24Format
+} from './time.js';
+
 import { SunAPI } from './sunapi.js';
 import { Coordinates } from './coordinates.js';
 import { WorldMap } from './worldmap.js';
 
-
-const intToZeroPaddedString = (sourceInt, numZeroesOnLeft) => {
-    const rawOneIndexedStr = sourceInt.toString();
-    if ( rawOneIndexedStr.length > numZeroesOnLeft ) {
-        throw new TypeError("Passed string longer than goal length!");
-    }
-    return rawOneIndexedStr.padStart(numZeroesOnLeft, "0");
-};
-
-const dateToFieldString = (date) => {
-    if ( isNullOrUndefined(date) ) {
-        date = new Date();
-    }
-    const base = [
-        intToZeroPaddedString(date.getFullYear() , 4),
-        intToZeroPaddedString(date.getMonth() + 1, 2),
-        intToZeroPaddedString(date.getDate()     , 2)
-    ];
-    return base.join("-");
-};
-
-const getHourMinString = (dateTime, use12Hour = true, onNullMessage = 'N/A') => {
-    if ( isNull(dateTime) ) {
-        return onNullMessage;
-    }
-    else {
-        return dateTime
-            .toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: use12Hour, timeZone: 'UTC'})
-            .toUpperCase();
-    }
-};
 
 const generateRadioButtonValueTranslationHandlers = (rawToFinalValueMapping, actionCallback) => {
     const result = new Map();

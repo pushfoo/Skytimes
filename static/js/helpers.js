@@ -45,6 +45,25 @@ const rangeToNormalized = (withinRange, rangeStartInclusive, rangeEndInclusive) 
     return ( withinRange - rangeStartInclusive ) / ( rangeEndInclusive - rangeStartInclusive );
 };
 
+
+/**
+ * Convert a positive integer to a string, left-padded to the specified length with zeroes.
+ * @param {number} sourceInt - an integer number
+ * @param {number} goalLength - how many zeroes should be on the left
+ * @returns {String} A string version of the given integer, left-padded with zeroes to reach the given length.
+ **/
+const positiveIntToZeroPrefixedString = (sourceInt, goalLength) => {
+    const unpaddedString = sourceInt.toString();
+    if ( sourceInt < 0 ) {
+        throw new TypeError(`sourceInt must be >= 0, but got ${unpaddedString}`);
+    }
+    if ( unpaddedString.length > goalLength ) {
+        throw new TypeError("sourceInt has more places than goalLength!");
+    }
+    return unpaddedString.padStart(goalLength, "0");
+};
+
+
 /**
  * Skip the first element or elements of an iterator
  * @param {Iterator}
@@ -117,6 +136,7 @@ export {
     isProperNormalized,
     normalizedToRange,
     rangeToNormalized,
+    positiveIntToZeroPrefixedString,
     arrayIterator,
     zip
 };
