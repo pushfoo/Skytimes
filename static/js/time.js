@@ -1,6 +1,7 @@
 import {
     isNull,
     isNullOrUndefined,
+    absentOrEmptyString,
     positiveIntToZeroPrefixedString,
     combineObjects
 } from './helpers.js';
@@ -84,9 +85,58 @@ const getLocalizedTime =
     };
 
 
+/**
+ *  Part of a workaround for time zones not having country prefixes for social and technical reasons
+ *  @constant
+ *  @type {Set}
+ *  @default
+ **/
+const DEFAULT_OMITTED_REGIONS = new Set([
+    "America",
+    "Asia",
+    "Europe",
+    "Africa",
+    "Pacific", // Australia is an exception as a continent & a country
+    "Indian"   // Madagascar has this as its region prefix for some reason
+]);
+
+
+/**
+ * Return a friendly display string for the passed time zone, or "Unknown Time Zone"
+ * @param {String} timezoneString - the time zone to convert to a friendly version
+ * @param {String} [displaySuffix] - what should be appended to the time zone
+ * @param {Set} [omitRegions] - a set of time zone suffixes to remove.
+ * @returns {String} a user-friendly version of the time zone string, or "Unknown Time Zone"
+ **/
+const getDisplayTimeZoneString = (timezoneString, omitRegions = DEFAULT_OMITTED_REGIONS) => {
+
+    if ( absentOrEmptyString(timezoneString) ) {
+        return "Unknown Timezone";
+    }
+
+    const rawParts = timezoneString.split('/');
+    const zoneName = rawParts.pop();
+    const outParts = [zoneName];
+
+    // Include the region if it's not a single-length time zone or forbidden region
+    if ( (! zoneName.startsWith("GMT")) && rawParts.length > 0 ) {
+        const regionName = rawParts.pop();
+
+        if ( ! omitRegions.has(regionName) ) {
+            outParts.push(", ", regionName);
+        }
+    }
+
+    return outParts
+        .join("")
+        .replaceAll("_", " "); // Some time zone strings contain underscores as space stand-ins
+}
+
+
 export {
     dateToFieldString,
     BASE_FORMAT_ARGS,
     COMMON_TIME_FORMATS,
     getLocalizedTime,
+    getDisplayTimeZoneString
 };
