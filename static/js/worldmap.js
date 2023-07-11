@@ -23,22 +23,27 @@ class WorldMap {
     }
 
     /**
-     * Set the coordinates to a new coordinate object & update the map position.
+     * Set coordinates, update map position, and use the callback if applicable.
      * @param {Coordinates} newCoordinates - the new coordinates.
      **/
     set coordinates(newCoordinates) {
         this._dotElement.style.top  = `${(1.0 - newCoordinates.normalizedLatitude ) * 100}%`
         this._dotElement.style.left = `${       newCoordinates.normalizedLongitude  * 100}%`;
         this._coordinates = newCoordinates;
+
+        if( !isNull(this.coordinateChangeCallback) ) {
+            this.coordinateChangeCallback(newCoordinates)
+        }
     }
+
 
     /**
      * Construct a map which converts clicks to Coordinates objects & calls the click handler if set.
      *
      * @param {String|HTMLElement} target - a query selector or direct HTML element wrapping a map & pointer.
-     * @param {function} clickCoordinateCallback - a function which takes a Coordinates object as an argument.
+     * @param {function} coordinateChangeCallback - a function which takes a Coordinates object as an argument.
      **/
-    constructor(target, coordinates = null, clickCoordinateCallback = null) {
+    constructor(target, coordinateChangeCallback = null, coordinates = null) {
         // Use strings as selector queries
         if ( target instanceof String ) {
             this._wrapperElement = document.querySelector(target);
@@ -53,24 +58,21 @@ class WorldMap {
         this._mapElement = this._wrapperElement.querySelector(':nth-child(1)');
         this._dotElement = this._wrapperElement.querySelector(':nth-child(2)');
 
-        // Default to the middle of the map if no coordinates specified
-        this.coordinates = isNull(coordinates) ? new Coordinates(0.0, 0.0) : coordinates
+        this.coordinateChangeCallback = coordinateChangeCallback;
 
-        this.clickCoordinateCallback = clickCoordinateCallback;
 
         this._wrapperElement.addEventListener("click", (event) => {
-
             const bbox     = this._wrapperElement.getBoundingClientRect();
             const normLat  = 1.0 - (event.clientY - bbox.top ) / bbox.height;
             const normLong =       (event.clientX - bbox.left) / bbox.width;
-
             this.coordinates = Coordinates.fromNormalized(normLat, normLong);
-
-            if ( ! isNull(this.clickCoordinateCallback) ) {
-                this.clickCoordinateCallback(this._coordinates);
-            }
-
         });
+
+        const usedCoordinates = isNull(coordinates) ? new Coordinates(0.0, 0.0) : coordinates;
+
+        // Delay setting the coordinates until after the map is initialized
+        // to prevent any references to it in the callback from failing.
+        setTimeout(() => { this.coordinates = usedCoordinates; }, 0);
 
     }
 
