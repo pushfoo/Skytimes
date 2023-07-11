@@ -10,6 +10,17 @@ const isNullOrUndefined = (obj) => {
     return isNull(obj, null) || isUndefined(obj, undefined);
 };
 
+
+/**
+ * Return true if the passed string is undefined, null, or equal to "".
+ * @param {String|null|undefined} toValidate - the value to check
+ * @returns {Boolean} true if the string is undefined, null, or equal to "".
+ **/
+const absentOrEmptyString = (toValidate) => {
+    return isNullOrUndefined(toValidate) || toValidate === "";
+}
+
+
 const firstLevelPropsToObj = (srcObj, ...props) => {
     var outObj = {};
     props.forEach(prop => outObj[prop] = srcObj[prop]);
@@ -173,6 +184,7 @@ export {
     isNull,
     isUndefined,
     isNullOrUndefined,
+    absentOrEmptyString,
     firstLevelPropsToObj,
     firstLevelPropsToArray,
     overrideObjectValuesFrom,
