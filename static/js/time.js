@@ -1,7 +1,8 @@
 import {
     isNull,
     isNullOrUndefined,
-    positiveIntToZeroPrefixedString
+    positiveIntToZeroPrefixedString,
+    combineObjects
 } from './helpers.js';
 
 export const name = "time";
@@ -25,47 +26,67 @@ const dateToFieldString = (date) => {
 };
 
 
-/**
- * Convert a datetime to a user-friendly short display string without the date or time zone.
- * @param {Datetime} datetime - the Datetime object to convert
- * @param {Boolean} use12hour - true to use AM/PM, false to use 24 hour time ('military' time)
- * @param {String} [timeZone] - UTC by default, but any valid time zone string can be used.
- * @param {String} [onNummMessage] - What should be displayed if the datetime is null.
- * @returns {String} A user-friendly representation of a date time specific to a time.
- **/
-const getHourMinString = (dateTime, use12Hour = true, timeZone = 'UTC', onNullMessage = 'N/A') => {
-    if ( isNull(dateTime) ) {
-        return onNullMessage;
-    }
-    else {
-        return dateTime
-            .toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', hour12: use12Hour, 'timeZone': timeZone})
-            .toUpperCase();
-    }
+const BASE_FORMAT_ARGS = {
+    outerFormatArgs: {
+        // This can be overriden to specify a format
+        languageString: navigator.language,
+        onNullMessage : 'N/A',
+        // This is safe to use as a default since non-latin languages ignore it.
+        toUpperCase : true,
+    },
+    /**
+     * These should be the same as object arguments to toLocaleTimeString supported for datetimes.
+     * For more information, see the following MDN page:
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleTimeString
+     **/
+    toLocaleTimeStringArgs: {}
 };
 
 
-/**
- * Convert a datetime to short 12 hour format, ie 12:01 PM.
- * @param {Datetime} dateTime - the datetime to convert
- * @param {String} [timeZone] - a valid time zone string
- * @returns {String} - A user-friendly short display string without the date or time zone.
- **/
-const hour12Format = (dateTime, timeZone = 'UTC') => getHourMinString(dateTime, true, timeZone);
+const COMMON_TIME_FORMATS = {
+    base   : BASE_FORMAT_ARGS,
+    hour12 : combineObjects(
+                BASE_FORMAT_ARGS,
+                {
+                    toLocaleTimeStringArgs: {hour: 'numeric', minute: 'numeric', timeZone: 'UTC', hour12: true }
+                }
+            ),
+    hour24 : combineObjects(
+                BASE_FORMAT_ARGS,
+                {
+                    toLocaleTimeStringArgs: {hour: 'numeric', minute: 'numeric', timeZone: 'UTC', hour12: false}
+                }
+            )
+    };
 
 
 /**
- * Convert a datetime to short 24 hour format, ie 20:00.
- * @param {Datetime} dateTime - the datetime to convert
- * @param {String} [timeZone] - a valid time zone string
- * @returns {String} - A user-friendly short display string without the date or time zone.
+ * Return a localized string for the passed Datetime. If no format is specified, system preferences will be used.
+ * @param {Datetime} dateTime - the Datetime instance to convert to a string.
+ * @param {object} [objectArgs] - A format specifier object.
+ * @returns {String} a user-friendly string matching the passed or system locale format.
  **/
-const hour24Format = (dateTime, timeZone = 'UTC') => getHourMinString(dateTime, false, timeZone);
+const getLocalizedTime =
+    (dateTime, objectArgs = {}) => {
+        const args = combineObjects(BASE_FORMAT_ARGS, objectArgs);
+        const {
+            languageString,
+            onNullMessage,
+            toUpperCase
+        } = args.outerFormatArgs;
+
+        if ( isNull(dateTime) ) {
+            return onNullMessage;
+        }
+
+        var result = dateTime.toLocaleTimeString(languageString, args.toLocaleTimeStringArgs);
+        return toUpperCase ? result.toUpperCase() : result;
+    };
 
 
 export {
     dateToFieldString,
-    getHourMinString,
-    hour12Format,
-    hour24Format
+    BASE_FORMAT_ARGS,
+    COMMON_TIME_FORMATS,
+    getLocalizedTime,
 };

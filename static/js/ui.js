@@ -1,9 +1,8 @@
 import { normalizedToRange, isNull, isNullOrUndefined } from './helpers.js';
 import {
     dateToFieldString,
-    getHourMinString,
-    hour12Format,
-    hour24Format
+    getLocalizedTime,
+    COMMON_TIME_FORMATS,
 } from './time.js';
 
 import { SunAPI } from './sunapi.js';
@@ -35,22 +34,18 @@ const bindRadioButtonChangeEventHandlers =
 
 class DateTimeUI {
 
-    set use12Hour(use12HourBool) {
-
-        if ( typeof use12HourBool != "boolean" ) {
-            throw new TypeError("use12HourBool must be a boolean value");
-        }
-        this._use12Hour = use12HourBool;
+    set timeFormat(newTimeFormat) {
+        this._timeFormat = newTimeFormat;
         this.refreshTimeDisplay();
     }
 
-    get use12Hour() {
-        return this._use12Hour;
+    get timeFormat() {
+        return this._timeFormat;
     }
 
     refreshTimeDisplay() {
-           this.sunriseDest.innerText = getHourMinString(this.eventTimes.sunrise, this._use12Hour);
-           this.sunsetDest.innerText  = getHourMinString(this.eventTimes.sunset, this._use12Hour);
+        this.sunriseDest.innerText = getLocalizedTime(this.eventTimes.sunrise, this._timeFormat);
+        this.sunsetDest.innerText  = getLocalizedTime(this.eventTimes.sunset , this._timeFormat);
     }
 
     set eventTimes(newEventTimes) {
@@ -82,7 +77,7 @@ class DateTimeUI {
         const { protocol, hostname, port } = window.location;
         this.sunAPI    = new SunAPI(`${protocol}\/\/${hostname}:${port}/api/`);
 
-        this._use12Hour  = true;
+        this._timeFormat = COMMON_TIME_FORMATS.hour12;
         this._eventTimes = null;
 
         this.sunriseDest = targetElement.querySelector("#sunriseDest");
@@ -118,13 +113,16 @@ class DateTimeUI {
             this.calculateTimes()
         });
 
-        // Bind update events for radio buttons
+        // Bind radio buttons change events as changing this object's timeFormat value
         this.timeRadios = targetElement.querySelector("#timeRadios");
         bindRadioButtonChangeEventHandlers(
             this.timeRadios,
             generateRadioButtonValueTranslationHandlers(
-                new Map([['12', true], ['24', false]]),
-                (value) => this.use12Hour = value
+                new Map([
+                    ['12', COMMON_TIME_FORMATS.hour12],
+                    ['24', COMMON_TIME_FORMATS.hour24]
+                ]),
+                (value) => this.timeFormat = value
             )
         );
 

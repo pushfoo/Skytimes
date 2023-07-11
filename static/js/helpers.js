@@ -20,6 +20,49 @@ const firstLevelPropsToArray = (srcObj, ...props) => {
     props.map(prop => srcObj[prop]);
 };
 
+
+/**
+ * Recursively override values in the first object with those of the second. Does not yet support maps.
+ * @param {object} destination - the object to write to.
+ * @param {object} source - a source object to copy from.
+ * @returns {undefined}
+ **/
+const overrideObjectValuesFrom = (destination, source) => {
+   for (const [key, sourceValue] of Object.entries(source)) {
+        const destinationValue = destination[key];
+        const destinationType = typeof destinationValue;
+        const sourceType = typeof sourceValue;
+
+        // Skip recursion on non-object types
+        if ( sourceType !== "object" ) {
+            destination[key] = sourceValue;
+        }
+
+        // Whenever the value is an object, recursively copy its values onto
+        // a new object, then use the new object as a value on this one.
+        else {
+            const objDest = destinationType === "object" ? destinationValue : {};
+            overrideObjectValuesFrom(objDest, sourceValue);
+            destination[key] = objDest;
+        }
+   }
+}
+
+
+/**
+ * Recursively combine the passed objects into a single object. Does not yet support maps.
+ * @param {...object} objects - one more more objects to combine
+ * @returns {object} a new object combining the values of the passed objects. Last item has highest priority.
+ */
+const combineObjects = (...objects) => {
+    const resultObject = {};
+    for (const currentObject of objects) {
+        overrideObjectValuesFrom(resultObject, currentObject);
+    }
+    return resultObject;
+};
+
+
 const boundCheck = (val, min, max) => {
     if ( min > max ) {
         throw new TypeError("min must be less than max");
@@ -125,12 +168,15 @@ function* zip(...sources) {
     }
 }
 
+
 export {
     isNull,
     isUndefined,
     isNullOrUndefined,
     firstLevelPropsToObj,
     firstLevelPropsToArray,
+    overrideObjectValuesFrom,
+    combineObjects,
     boundCheck,
     symmetricCheck,
     isProperNormalized,
