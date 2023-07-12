@@ -1,8 +1,16 @@
-import { normalizedToRange, isNull, isNullOrUndefined } from './helpers.js';
+import {
+    isNull,
+    isNullOrUndefined,
+    combineObjects,
+    normalizedToRange,
+    overrideObjectValuesFrom
+} from './helpers.js';
+
 import {
     dateToFieldString,
     getLocalizedTime,
     COMMON_TIME_FORMATS,
+    getDisplayTimeZoneString
 } from './time.js';
 
 import { SunAPI } from './sunapi.js';
@@ -34,24 +42,58 @@ const bindRadioButtonChangeEventHandlers =
 
 class DateTimeUI {
 
+    set rawTimeFormat(newTimeFormat) {
+        this._rawTimeFormat = newTimeFormat;
+        this._rebuildTimeFormat();
+        this.refreshEventTimeDisplay();
+    }
+
+    get rawTimeFormat() {
+        return this._rawTimeFormat;
+    }
+
     set timeFormat(newTimeFormat) {
-        this._timeFormat = newTimeFormat;
-        this.refreshTimeDisplay();
+        throw new TypeError("Setting timeFormat directly is not allowed! Set rawTimeFormat instead!");
     }
 
     get timeFormat() {
         return this._timeFormat;
     }
 
-    refreshTimeDisplay() {
+    get rawTimeZone() {
+        return this._rawTimeZone;
+    }
+
+    refreshTimeZoneDisplay(force = false) {
+        this.zoneDest.innerText = `Time Zone: ${getDisplayTimeZoneString(this._rawTimeZone)}`;
+    }
+
+    _rebuildTimeFormat() {
+        this._timeFormat = combineObjects(
+            this._rawTimeFormat,
+            { toLocaleTimeStringArgs: { 'timeZone' : this._rawTimeZone } }
+        );
+    }
+
+    set rawTimeZone(newTimeZone) {
+        // Only take action if we've set a new time zone
+        if ( this._rawTimeZone !== newTimeZone ) {
+            this._rawTimeZone = newTimeZone;
+            this._rebuildTimeFormat();
+            this.refreshTimeZoneDisplay()
+        }
+    }
+
+    refreshEventTimeDisplay() {
         this.sunriseDest.innerText = getLocalizedTime(this.eventTimes.sunrise, this._timeFormat);
         this.sunsetDest.innerText  = getLocalizedTime(this.eventTimes.sunset , this._timeFormat);
     }
 
     set eventTimes(newEventTimes) {
         this._eventTimes = newEventTimes;
-        this.refreshTimeDisplay();
+        this.refreshEventTimeDisplay();
     }
+
     get eventTimes() {
         return this._eventTimes;
     }
@@ -77,41 +119,46 @@ class DateTimeUI {
         const { protocol, hostname, port } = window.location;
         this.sunAPI    = new SunAPI(`${protocol}\/\/${hostname}:${port}/api/`);
 
-        this._timeFormat = COMMON_TIME_FORMATS.hour12;
-        this._eventTimes = null;
+        // Set up time zone formatting & table header item
+        this.zoneDest         = targetElement.querySelector("#zoneDest");
+        this._rawTimeFormat   = COMMON_TIME_FORMATS.hour12;
+        this._rawTimeZone     = 'UTC';
+        this._timeFormat      = null;
+        this._rebuildTimeFormat();
 
+        // Storage & write destination for event times
+        this._eventTimes = null;
         this.sunriseDest = targetElement.querySelector("#sunriseDest");
         this.sunsetDest  = targetElement.querySelector("#sunsetDest");
 
-        // Set up the date field & set it to a default value
+        // Set up the date field & bind date field change events
         const form          = targetElement.querySelector("#locationForm");
         const elements      = form.elements;
         this.dateField      = elements["date"];
         this.dateElement    = targetElement.querySelector('#date');
-
-        this.longitudeField = elements["longitude"];
-        this.latitudeField  = elements["latitude"];
-
         this.setDate();
 
-        // Set up map elements
-        this.worldMap     = new WorldMap(
-            targetElement.querySelector("#mapWrapper"),
-            // Center on 0, 0 if coordinates not specified
-            new Coordinates(0,0),
-            (coordinates) => {
-                this.latitudeField.value = coordinates.latitude.toString();
-                this.longitudeField.value = coordinates.longitude.toString();
-                this.calculateTimes();
-            }
-        );
-        this.calculateTimes();
-
-        // Bind updates on the date field changing
         this.dateElement.addEventListener("change", (event) => {
             this.date =  new Date(Date.parse(this.dateField.value));
             this.calculateTimes()
         });
+
+        // Set up map & related elements
+        this.longitudeField = elements["longitude"];
+        this.latitudeField  = elements["latitude"];
+
+        this.worldMap     = new WorldMap(
+            targetElement.querySelector("#mapWrapper"),
+            (coordinates) => {
+                this.latitudeField.value = coordinates.latitude.toString();
+                this.longitudeField.value = coordinates.longitude.toString();
+                this.sunAPI.getTimezoneForLocation(
+                    (zoneString) => { this.rawTimeZone = zoneString; },
+                    coordinates
+                );
+                this.calculateTimes();
+            }
+        );
 
         // Bind radio buttons change events as changing this object's timeFormat value
         this.timeRadios = targetElement.querySelector("#timeRadios");
@@ -122,7 +169,7 @@ class DateTimeUI {
                     ['12', COMMON_TIME_FORMATS.hour12],
                     ['24', COMMON_TIME_FORMATS.hour24]
                 ]),
-                (value) => this.timeFormat = value
+                (value) => this.rawTimeFormat = value
             )
         );
 
