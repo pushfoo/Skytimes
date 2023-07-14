@@ -4,9 +4,12 @@ A minimal web application which calculates sunset & sunrise times for
 locations around the world. The front end communicates with the API 
 via JSON fetch requests.
 
+I haven't decided on a license for this project at the moment.
+
 ## Project Goals
 
 - [x] Demonstrate practical knowledge of HTML, CSS, XML, and JSON
+- [x] Try [FastAPI](https://fastapi.tiangolo.com/)
 - [x] Learn about modern JavaScript techniques
 
 ## Screenshot
