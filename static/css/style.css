@@ -2,6 +2,18 @@ html, body {
     height: 100%;
 }
 
+/* Center table on the screen using modern flex display */
+#eventTimes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#eventTimes tbody > tr {
+    background-color: var(--background-color);
+}
+
+
 #locationDisplay form  {
     margin-top: 0.5rem;
 }
@@ -44,19 +56,6 @@ section > *  {
 form > label {
     width: 100%;
     display: block;
-}
-
-/* Center table on the screen the simple, old-school way*/
-#eventTimes {
-    text-align: center;
-}
-
-#eventTimes > * {
-    display: inline-block;
-}
-
-#eventTimes tbody > tr {
-    background-color: var(--background-color);
 }
 
 /* Use horizontal layout on larger screens */
