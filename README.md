@@ -1,8 +1,8 @@
 # Skytimes
 
-A minimal web application which calculates sunset & sunrise times for
-locations around the world. The front end communicates with the API 
-via JSON fetch requests.
+A minimal web application to calculate sunset & sunrise times around
+the world. The front end currently communicates with an API via JSON
+fetch requests, but it could probably be made more static.
 
 I haven't decided on a license for this project at the moment.
 
