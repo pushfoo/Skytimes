@@ -21,7 +21,7 @@ classifiers=[
 dependencies = [
     'suntime==1.2.5',
     'timezonefinder==6.2.0',
-    'uvicorn==0.22.0',
+    'uvicorn==0.27.1',
     'fastapi==0.99.0'
 ]
 
